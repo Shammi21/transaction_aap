@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
+import Dashboard from './components/Dashboard';
+import RequestPage from './components/NewRequestPage';
+import CardDetailsPage from './components/CardDetailsPage';
+import BankDetailsPage from './components/BankDetailsPage';
+import UploadReceiptsPage from './components/UploadReceiptsPage';
+import TransactionsPage from './components/TransactionsPage';
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LoginPage />} />
+
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/request" element={<RequestPage />} />
+        <Route path="/card-details" element={<CardDetailsPage />} />
+        <Route path="/bank-details" element={<BankDetailsPage />} />
+        <Route path="/upload-receipts" element={<UploadReceiptsPage />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
+
+
+        {/* Fallback Route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
