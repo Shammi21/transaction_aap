@@ -1,9 +1,6 @@
-// src/LoginPage.js
-
 import React, { useState } from "react";
-import styled from "styled-components";
+import { TextField, Button, Box, Typography, Container, Checkbox, FormControlLabel, Paper, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaLock } from "react-icons/fa";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -25,115 +22,137 @@ const LoginPage = () => {
   };
 
   return (
-    <Container>
-      <Form onSubmit={handleSubmit}>
-        <Title>Login to Your Account</Title>
-        <InputWrapper>
-          <Label htmlFor="username">Username</Label>
-          <Input
-            type="text"
-            id="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <Icon>
-            <FaUser />
-          </Icon>
-        </InputWrapper>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(to bottom right, #d16ba5, #86a8e7, #5ffbf1)", // gradient background
+      }}
+    >
+      <Paper
+        elevation={12}
+        sx={{
+          padding: 4,
+          borderRadius: "16px",
+          maxWidth: 400,
+          width: "100%",
+          background: "rgba(255, 255, 255, 0.9)",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          {/* User Icon */}
+          <Box
+            sx={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              backgroundColor: "#ff9a8b",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Typography variant="h6" sx={{ color: "#fff", fontSize: "32px" }}>
+              👤
+            </Typography>
+          </Box>
 
-        <InputWrapper>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Icon>
-            <FaLock />
-          </Icon>
-        </InputWrapper>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#333",
+              marginBottom: 2,
+            }}
+          >
+            Login to Nova
+          </Typography>
 
-        <Button type="submit">Login</Button>
-      </Form>
-    </Container>
+          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+            <Grid container spacing={2}>
+              {/* Username Field */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                    },
+                  }}
+                />
+              </Grid>
+
+              {/* Password Field */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                    },
+                  }}
+                />
+              </Grid>
+
+              {/* Remember Me and Forgot Password */}
+              <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <FormControlLabel
+                  control={<Checkbox color="primary" />}
+                  label="Remember me"
+                  sx={{ margin: 0 }}
+                />
+                <Typography variant="body2" sx={{ color: "#007BFF", cursor: "pointer" }}>
+                  Forgot Password?
+                </Typography>
+              </Grid>
+
+              {/* Login Button */}
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    background: "linear-gradient(to right, #ff7e5f, #feb47b)",
+                    padding: "12px",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    color: "#fff",
+                    "&:hover": {
+                      background: "linear-gradient(to right, #feb47b, #ff7e5f)",
+                    },
+                  }}
+                >
+                  Login
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
 export default LoginPage;
-
-// Add styled components from the previous example here
-// Styled components for styling the login page
-
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(45deg, #4a90e2, #50e3c2);
-`;
-
-const Form = styled.form`
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
-  margin-bottom: 20px;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #555;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px 30px 12px 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  box-sizing: border-box;
-  outline: none;
-  &:focus {
-    border-color: #4a90e2;
-  }
-`;
-
-const Icon = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  color: #4a90e2;
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 12px;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  &:hover {
-    background-color: #357ab7;
-  }
-`;
