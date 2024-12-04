@@ -29,7 +29,7 @@ const Dashboard = () => {
       <AppBar position="static" sx={{ backgroundColor: '#4a90e2' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            TransactionApp
+            Nova Transfer
           </Typography>
           <Button color="inherit" onClick={handleTransactions}>
             Transactions
