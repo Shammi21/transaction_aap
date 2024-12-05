@@ -1,7 +1,9 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Paper, Container, Grid, Card, CardContent } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Paper, Container, Grid, Card, CardContent,ButtonGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Home, ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -23,21 +25,59 @@ const Dashboard = () => {
       {/* Navbar */}
       <AppBar position="static" sx={{ backgroundColor: '#4a90e2' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Nova Transfer
           </Typography>
-          <Button color="inherit" onClick={() => navigate('/transactions')}>
-            Transactions
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/request')}>
-            New Request
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/upload-receipts')}>
-            Upload Receipt
-          </Button>
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
-          </Button>
+          <ButtonGroup variant="text" aria-label="nav buttons" sx={{ gap: 1 }}>
+            <Button
+              startIcon={<ListAlt />}
+              sx={{
+                color: 'white',
+                '&:hover': { backgroundColor: '#3a7bd5' },
+                textTransform: 'capitalize',
+                fontWeight: 'medium',
+              }}
+              onClick={() => navigate('/transactions')}
+            >
+              Transactions
+            </Button>
+            <Button
+              startIcon={<AddCircle />}
+              sx={{
+                color: 'white',
+                '&:hover': { backgroundColor: '#3a7bd5' },
+                textTransform: 'capitalize',
+                fontWeight: 'medium',
+              }}
+              onClick={() => navigate('/request')}
+            >
+              New Request
+            </Button>
+            <Button
+              startIcon={<ReceiptLong />}
+              sx={{
+                color: 'white',
+                '&:hover': { backgroundColor: '#3a7bd5' },
+                textTransform: 'capitalize',
+                fontWeight: 'medium',
+              }}
+              onClick={() => navigate('/upload-receipts')}
+            >
+              Upload Receipt
+            </Button>
+            <Button
+              startIcon={<Logout />}
+              sx={{
+                color: 'white',
+                '&:hover': { backgroundColor: '#c83333' },
+                textTransform: 'capitalize',
+                fontWeight: 'medium',
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </ButtonGroup>
         </Toolbar>
       </AppBar>
 

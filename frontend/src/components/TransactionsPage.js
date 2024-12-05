@@ -19,6 +19,7 @@ import {
     Modal,
     Backdrop,
     Fade,
+    TablePagination,  // Import TablePagination component
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -61,6 +62,15 @@ const TransactionsPage = () => {
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
 
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+
+    // Calculate total amount of successful transactions
+    const totalSuccessfulAmount = transactions
+        .filter(transaction => transaction.status === 'Successful')
+        .reduce((acc, transaction) => acc + transaction.amount, 0);
+
     // Filter transactions based on search and date range
     const filteredTransactions = transactions.filter((transaction) => {
         const transactionDate = dayjs(transaction.date);
@@ -79,6 +89,17 @@ const TransactionsPage = () => {
             transaction.status.toLowerCase().includes(searchLower)
         );
     });
+
+    // Handle page change
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    // Handle rows per page change
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     const handleBackToDashboard = () => {
         navigate('/dashboard');
@@ -110,134 +131,110 @@ const TransactionsPage = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleBackToDashboard}
-                sx={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    borderRadius: '20px',
-                    padding: '6px 16px',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                    textTransform: 'none',
-                    '&:hover': {
-                        boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)',
-                    },
-                }}
+                sx={{ position: 'absolute', top: 20, left: 20 }}
             >
                 Back to Dashboard
             </Button>
-            <Button
-                variant="outlined"
-                color="secondary"
-                onClick={resetFilters}
-                sx={{
-                    position: 'absolute',
-                    top: '80px',
-                    right: '20px',
-                    borderRadius: '20px',
-                    padding: '6px 16px',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    border: '1px solid rgba(0, 0, 0, 0.12)',
-                    textTransform: 'none',
-                    '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                    },
-                }}
-            >
-                All Transactions
-            </Button>
 
-            {/* Page Title */}
-            <Container maxWidth="lg" sx={{ mt: 4 }}>
-                <Typography variant="h4" gutterBottom textAlign="center" sx={{ fontWeight: 'bold', mb: 4 }}>
+            <Container maxWidth="lg" sx={{ marginTop: '100px' }}>
+                {/* Header */}
+                <Typography variant="h4" gutterBottom>
                     Transaction History
                 </Typography>
 
-                {/* Search and Date Range Filters */}
-                <Box sx={{ mb: 4 }}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="center">
-                        {/* Search Bar */}
-                        <Grid item xs={12} sm={6} md={4}>
-                            <TextField
-                                label="Search"
-                                variant="outlined"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                fullWidth
-                            />
-                        </Grid>
+                {/* Total Successful Amount */}
+                <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+                    Total Successful Transactions: <strong>${totalSuccessfulAmount.toFixed(2)}</strong>
+                </Typography>
 
-                        {/* Date Range Pickers */}
-                        <Grid item xs={12} sm={6} md={2}>
-                            <TextField
-                                type="date"
-                                label="Start Date"
-                                value={startDate.format('YYYY-MM-DD')}
-                                onChange={(e) => setStartDate(dayjs(e.target.value))}
-                                InputLabelProps={{ shrink: true }}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={2}>
-                            <TextField
-                                type="date"
-                                label="End Date"
-                                value={endDate.format('YYYY-MM-DD')}
-                                onChange={(e) => setEndDate(dayjs(e.target.value))}
-                                InputLabelProps={{ shrink: true }}
-                                fullWidth
-                            />
-                        </Grid>
+                {/* Filters */}
+                <Grid container spacing={3} alignItems="center" marginBottom={3}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            fullWidth
+                            label="Search Transactions"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </Grid>
-                </Box>
 
-                {/* Transaction Table */}
-                <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: '8px' }}>
-                    <Table>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            fullWidth
+                            type="date"
+                            label="Start Date"
+                            InputLabelProps={{ shrink: true }}
+                            value={startDate.format('YYYY-MM-DD')}
+                            onChange={(e) => setStartDate(dayjs(e.target.value))}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            fullWidth
+                            type="date"
+                            label="End Date"
+                            InputLabelProps={{ shrink: true }}
+                            value={endDate.format('YYYY-MM-DD')}
+                            onChange={(e) => setEndDate(dayjs(e.target.value))}
+                        />
+                    </Grid>
+                </Grid>
+
+                {/* Reset Filters Button */}
+                <Button variant="outlined" onClick={resetFilters} sx={{ marginBottom: '20px' }}>
+                    Reset Filters
+                </Button>
+
+                {/* Transactions Table */}
+                <TableContainer component={Paper}>
+                    <Table aria-label="Transactions Table">
                         <TableHead>
                             <TableRow>
-                                <TableCell><strong>Transaction ID</strong></TableCell>
-                                <TableCell><strong>Date</strong></TableCell>
-                                <TableCell><strong>Time</strong></TableCell>
-                                <TableCell><strong>Amount (USD)</strong></TableCell>
-                                <TableCell><strong>Payment Method</strong></TableCell>
-                                <TableCell><strong>Status</strong></TableCell>
+                                <TableCell>ID</TableCell>
+                                <TableCell>Date</TableCell>
+                                <TableCell>Time</TableCell>
+                                <TableCell>Amount</TableCell>
+                                <TableCell>Method</TableCell>
+                                <TableCell>Status</TableCell>
+                                <TableCell>Details</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredTransactions.length > 0 ? (
-                                filteredTransactions.map((transaction) => (
-                                    <TableRow
-                                        key={transaction.id}
-                                        onClick={() => handleOpenModal(transaction)}
-                                        sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}
-                                    >
-                                        <TableCell>{transaction.id}</TableCell>
-                                        <TableCell>{transaction.date}</TableCell>
-                                        <TableCell>{transaction.time}</TableCell>
-                                        <TableCell>${transaction.amount.toFixed(2)}</TableCell>
-                                        <TableCell>{transaction.method}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={transaction.status}
-                                                color={transaction.status === 'Successful' ? 'success' : 'error'}
-                                                variant="outlined"
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center">
-                                        No transactions found.
+                            {filteredTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction) => (
+                                <TableRow key={transaction.id}>
+                                    <TableCell>{transaction.id}</TableCell>
+                                    <TableCell>{transaction.date}</TableCell>
+                                    <TableCell>{transaction.time}</TableCell>
+                                    <TableCell>{transaction.amount}</TableCell>
+                                    <TableCell>{transaction.method}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={transaction.status}
+                                            color={transaction.status === 'Successful' ? 'success' : 'error'}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button variant="outlined" onClick={() => handleOpenModal(transaction)}>
+                                            View
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
-                            )}
+                            ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                {/* Pagination */}
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={filteredTransactions.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
             </Container>
 
             {/* Modal for Transaction Details */}
@@ -249,46 +246,38 @@ const TransactionsPage = () => {
                 BackdropProps={{ timeout: 500 }}
             >
                 <Fade in={modalOpen}>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 400,
-                            bgcolor: 'background.paper',
-                            border: '2px solid #000',
-                            boxShadow: 24,
-                            p: 4,
-                            borderRadius: '10px',
-                        }}
-                    >
+                    <Box sx={{ ...modalStyle }}>
                         {selectedTransaction && (
-                            <>
-                                <Typography variant="h6" sx={{ mb: 2 }}>
-                                    Transaction Details
-                                </Typography>
-                                <Typography><strong>ID:</strong> {selectedTransaction.id}</Typography>
-                                <Typography><strong>Date:</strong> {selectedTransaction.date}</Typography>
-                                <Typography><strong>Time:</strong> {selectedTransaction.time}</Typography>
-                                <Typography><strong>Amount:</strong> ${selectedTransaction.amount.toFixed(2)}</Typography>
-                                <Typography><strong>Method:</strong> {selectedTransaction.method}</Typography>
-                                <Typography><strong>Status:</strong> {selectedTransaction.status}</Typography>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleCloseModal}
-                                    sx={{ mt: 2, borderRadius: '20px' }}
-                                >
+                            <div>
+                                <Typography variant="h6">Transaction Details</Typography>
+                                <Typography>ID: {selectedTransaction.id}</Typography>
+                                <Typography>Date: {selectedTransaction.date}</Typography>
+                                <Typography>Time: {selectedTransaction.time}</Typography>
+                                <Typography>Amount: ${selectedTransaction.amount}</Typography>
+                                <Typography>Method: {selectedTransaction.method}</Typography>
+                                <Typography>Status: {selectedTransaction.status}</Typography>
+                                <Button variant="contained" color="primary" onClick={handleCloseModal}>
                                     Close
                                 </Button>
-                            </>
+                            </div>
                         )}
                     </Box>
                 </Fade>
             </Modal>
         </Box>
     );
+};
+
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: 24,
+    minWidth: '300px',
 };
 
 export default TransactionsPage;

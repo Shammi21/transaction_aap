@@ -24,7 +24,12 @@ const UploadReceiptsPage = () => {
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
-    setReceipts((prevReceipts) => [...prevReceipts, ...files]);
+    // Create Object URL for each file and store it along with the file details
+    const newReceipts = files.map((file) => ({
+      file,
+      fileUrl: URL.createObjectURL(file), // Create Object URL
+    }));
+    setReceipts((prevReceipts) => [...prevReceipts, ...newReceipts]);
   };
 
   const handleDelete = () => {
@@ -44,6 +49,10 @@ const UploadReceiptsPage = () => {
 
   const handleBack = () => {
     navigate('/dashboard'); // Redirect back to the Dashboard
+  };
+
+  const handleOpenFile = (fileUrl) => {
+    window.open(fileUrl, '_blank'); // Open the file in a new tab
   };
 
   return (
@@ -75,7 +84,7 @@ const UploadReceiptsPage = () => {
         {/* Receipts List */}
         <Box sx={{ maxHeight: 300, overflowY: 'auto', width: '100%' }}>
           <List>
-            {receipts.map((file, index) => (
+            {receipts.map((receipt, index) => (
               <ListItem
                 key={index}
                 sx={{
@@ -86,12 +95,17 @@ const UploadReceiptsPage = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                 }}
+                button
+                onClick={() => handleOpenFile(receipt.fileUrl)} // Open the file in a new tab
               >
-                <ListItemText primary={file.name} />
+                <ListItemText primary={receipt.file.name} />
                 <IconButton
                   edge="end"
                   color="error"
-                  onClick={() => handleOpenDeleteDialog(index)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent opening the file when clicking delete
+                    handleOpenDeleteDialog(index);
+                  }}
                 >
                   <DeleteIcon />
                 </IconButton>
