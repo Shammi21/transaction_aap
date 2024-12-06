@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid, CircularProgress, Alert } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid, CircularProgress, Alert, IconButton, InputAdornment, Input } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import axios from "axios";
+import { Visibility, VisibilityOff } from '@mui/icons-material'; // Importing icons for showing/hiding password
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State to control password visibility
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [validationError, setValidationError] = useState({
     username: false,
     password: false
-  })
+  });
   const [snakBar, setSnakBar] = useState({
     text: '',
     status: ''
-  })
+  });
 
   const handleClick = () => {
     setOpen(true);
@@ -32,18 +34,17 @@ const LoginPage = () => {
     e.preventDefault();
     // Basic validation
     if (!username && !password) {
-      setValidationError(() => ({ password: true, username: true }))
+      setValidationError(() => ({ password: true, username: true }));
       return;
     }
     if (!username) {
-      setValidationError((prev) => ({ ...prev, username: true }))
+      setValidationError((prev) => ({ ...prev, username: true }));
       return;
     }
     if (!password) {
-      setValidationError((prev) => ({ ...prev, password: true }))
+      setValidationError((prev) => ({ ...prev, password: true }));
       return;
     }
-
 
     setLoading(true);
     try {
@@ -54,26 +55,25 @@ const LoginPage = () => {
       if (response?.data) {
         navigate("/dashboard");
       } else {
-        setSnakBar({ text: 'Invalid username or password', status: 'error' })
+        setSnakBar({ text: 'Invalid username or password', status: 'error' });
       }
-      setSnakBar({ text: 'Login successfully', status: 'success' })
+      setSnakBar({ text: 'Login successfully', status: 'success' });
       setLoading(false);
       return response.data;
     } catch (error) {
-      handleClick()
+      handleClick();
       console.error("Login failed:", error.response?.data || error.message);
       setLoading(false);
-      setSnakBar({ text: 'Login failed', status: 'error' })
+      setSnakBar({ text: 'Login failed', status: 'error' });
     }
-
   };
 
   useEffect(() => {
     setValidationError({
       username: false,
       password: false
-    })
-  }, [username, password])
+    });
+  }, [username, password]);
 
   return (
     <Box
@@ -169,13 +169,25 @@ const LoginPage = () => {
                   variant="outlined"
                   label="Password"
                   error={validationError.password}
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Show password or hide based on state
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "8px",
                     },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                   }}
                 />
               </Grid>
