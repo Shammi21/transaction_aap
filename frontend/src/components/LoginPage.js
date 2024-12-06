@@ -1,24 +1,36 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid } from "@mui/material";
+import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const validUsername = "test";
-    const validPassword = "123";
-
-    if (username === validUsername && password === validPassword) {
-      console.log("Login Successful");
-      navigate("/dashboard"); // Redirect to dashboard
-    } else {
-      alert("Invalid username or password");
+    // Basic validation
+    if (!username || !password) {
+      alert("Please fill in both fields.");
+      return;
     }
+
+    // Simulate loading for login process
+    setLoading(true);
+    setTimeout(() => {
+      const validUsername = "test";
+      const validPassword = "123";
+
+      if (username === validUsername && password === validPassword) {
+        console.log("Login Successful");
+        navigate("/dashboard"); // Redirect to dashboard
+      } else {
+        alert("Invalid username or password");
+      }
+      setLoading(false);
+    }, 1500); // Simulate a network delay
   };
 
   return (
@@ -28,7 +40,7 @@ const LoginPage = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(to bottom right, #d16ba5, #86a8e7, #5ffbf1)", // gradient background
+        background: "linear-gradient(to bottom right, #d16ba5, #86a8e7, #5ffbf1)", // Gradient background
       }}
     >
       <Paper
@@ -121,7 +133,11 @@ const LoginPage = () => {
                   label="Remember me"
                   sx={{ margin: 0 }}
                 />
-                <Typography variant="body2" sx={{ color: "#007BFF", cursor: "pointer" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#007BFF", cursor: "pointer" }}
+                  onClick={() => navigate("/forgot-password")} // Navigate to forgot password page
+                >
                   Forgot Password?
                 </Typography>
               </Grid>
@@ -132,6 +148,7 @@ const LoginPage = () => {
                   fullWidth
                   type="submit"
                   variant="contained"
+                  disabled={loading}
                   sx={{
                     background: "linear-gradient(to right, #ff7e5f, #feb47b)",
                     padding: "12px",
@@ -144,7 +161,7 @@ const LoginPage = () => {
                     },
                   }}
                 >
-                  Login
+                  {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Login"}
                 </Button>
               </Grid>
             </Grid>

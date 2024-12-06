@@ -7,12 +7,14 @@ import CardDetailsPage from './components/CardDetailsPage';
 import BankDetailsPage from './components/BankDetailsPage';
 import UploadReceiptsPage from './components/UploadReceiptsPage';
 import TransactionsPage from './components/TransactionsPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
 const App = () => {
   return (
     <Router>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
