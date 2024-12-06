@@ -14,7 +14,7 @@ const LoginPage = () => {
     password: false
   })
   const [snakBar, setSnakBar] = useState({
-    text : '',
+    text: '',
     status: ''
   })
 
@@ -31,48 +31,42 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Basic validation
-    if(!username && !password){
-      setValidationError(() => ({password : true, username : true}))
+    if (!username && !password) {
+      setValidationError(() => ({ password: true, username: true }))
       return;
     }
     if (!username) {
-      setValidationError((prev) => ({...prev, username : true}))
+      setValidationError((prev) => ({ ...prev, username: true }))
       return;
     }
     if (!password) {
-      setValidationError((prev) => ({...prev, password : true}))
+      setValidationError((prev) => ({ ...prev, password: true }))
       return;
     }
-    
-    
+
+
     setLoading(true);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/login`, {
+      const response = await axios.post('https://nova.terrapayz.com/api/auth/login', {
         username,
-        password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true, 
+        password
       });
       if (response?.data) {
         navigate("/dashboard");
       } else {
-        setSnakBar({text : 'Invalid username or password', status: 'error'})
+        setSnakBar({ text: 'Invalid username or password', status: 'error' })
       }
-      setSnakBar({text : 'Login successfully', status: 'success'})
+      setSnakBar({ text: 'Login successfully', status: 'success' })
       setLoading(false);
-      return response.data; 
+      return response.data;
     } catch (error) {
       handleClick()
       console.error("Login failed:", error.response?.data || error.message);
       setLoading(false);
-      setSnakBar({text : 'Login failed', status: 'error'})
+      setSnakBar({ text: 'Login failed', status: 'error' })
     }
 
-  }; 
+  };
 
   useEffect(() => {
     setValidationError({
@@ -91,7 +85,7 @@ const LoginPage = () => {
         background: "linear-gradient(to bottom right, #d16ba5, #86a8e7, #5ffbf1)", // Gradient background
       }}
     >
-      <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'center' }} open={open} autoHideDuration={3000} onClose={handleClose}>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={open} autoHideDuration={3000} onClose={handleClose}>
         <Alert
           onClose={handleClose}
           severity={snakBar.status}
