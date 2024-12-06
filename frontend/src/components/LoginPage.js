@@ -1,37 +1,85 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid, CircularProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Button, Box, Typography, Checkbox, FormControlLabel, Paper, Grid, CircularProgress, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Snackbar from '@mui/material/Snackbar';
+import axios from "axios";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [validationError, setValidationError] = useState({
+    username: false,
+    password: false
+  })
+  const [snakBar, setSnakBar] = useState({
+    text : '',
+    status: ''
+  })
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     // Basic validation
-    if (!username || !password) {
-      alert("Please fill in both fields.");
+    if(!username && !password){
+      setValidationError(() => ({password : true, username : true}))
       return;
     }
-
-    // Simulate loading for login process
+    if (!username) {
+      setValidationError((prev) => ({...prev, username : true}))
+      return;
+    }
+    if (!password) {
+      setValidationError((prev) => ({...prev, password : true}))
+      return;
+    }
+    
+    
     setLoading(true);
-    setTimeout(() => {
-      const validUsername = "test";
-      const validPassword = "123";
-
-      if (username === validUsername && password === validPassword) {
-        console.log("Login Successful");
-        navigate("/dashboard"); // Redirect to dashboard
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/login`, {
+        username,
+        password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, 
+      });
+      if (response?.data) {
+        navigate("/dashboard");
       } else {
-        alert("Invalid username or password");
+        setSnakBar({text : 'Invalid username or password', status: 'error'})
       }
+      setSnakBar({text : 'Login successfully', status: 'success'})
       setLoading(false);
-    }, 1500); // Simulate a network delay
-  };
+      return response.data; 
+    } catch (error) {
+      handleClick()
+      console.error("Login failed:", error.response?.data || error.message);
+      setLoading(false);
+      setSnakBar({text : 'Login failed', status: 'error'})
+    }
+
+  }; 
+
+  useEffect(() => {
+    setValidationError({
+      username: false,
+      password: false
+    })
+  }, [username, password])
 
   return (
     <Box
@@ -43,6 +91,16 @@ const LoginPage = () => {
         background: "linear-gradient(to bottom right, #d16ba5, #86a8e7, #5ffbf1)", // Gradient background
       }}
     >
+      <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'center' }} open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert
+          onClose={handleClose}
+          severity={snakBar.status}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snakBar.text}
+        </Alert>
+      </Snackbar>
       <Paper
         elevation={12}
         sx={{
@@ -100,6 +158,7 @@ const LoginPage = () => {
                   variant="outlined"
                   label="Username"
                   value={username}
+                  error={validationError.username}
                   onChange={(e) => setUsername(e.target.value)}
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -115,6 +174,7 @@ const LoginPage = () => {
                   fullWidth
                   variant="outlined"
                   label="Password"
+                  error={validationError.password}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
