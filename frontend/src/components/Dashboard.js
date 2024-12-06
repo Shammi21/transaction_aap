@@ -2,7 +2,7 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Paper, Container, Grid, Card, CardContent,ButtonGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Home, ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
+import { ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
 
 
 const Dashboard = () => {
