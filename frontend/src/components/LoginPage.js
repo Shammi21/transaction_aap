@@ -53,7 +53,11 @@ const LoginPage = () => {
         password
       });
       if (response?.data) {
-        navigate("/dashboard");
+        if(response?.data.data.type == 'UserType.ADMIN'){
+          navigate("/admin-dashboard");
+        }else{
+          navigate("/dashboard");
+        }
       } else {
         setSnakBar({ text: 'Invalid username or password', status: 'error' });
       }
