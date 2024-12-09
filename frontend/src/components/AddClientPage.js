@@ -43,7 +43,7 @@ const AdminClientPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Nova Transfer
           </Typography>
-          <Button color="inherit" onClick={() => navigate('/dashboard')}>
+          <Button color="inherit" onClick={() => navigate('/admin-dashboard')}>
             Dashboard
           </Button>
         </Toolbar>
