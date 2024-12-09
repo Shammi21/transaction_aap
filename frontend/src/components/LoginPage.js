@@ -53,7 +53,7 @@ const LoginPage = () => {
         password
       });
       if (response?.data) {
-        if(response?.data.data.type == 'UserType.ADMIN'){
+        if(response?.data.data.type === 'UserType.ADMIN'){
           navigate("/admin-dashboard");
         }else{
           navigate("/dashboard");
