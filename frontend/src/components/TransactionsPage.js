@@ -277,7 +277,6 @@ const TransactionsPage = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {console.log(filteredTransactions)}
                             {filteredTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction) => (
                                 <TableRow key={transaction.id}>
                                     <TableCell>{transaction.id}</TableCell>
