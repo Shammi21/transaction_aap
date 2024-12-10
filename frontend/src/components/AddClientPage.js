@@ -9,11 +9,13 @@ import {
   TextField,
   MenuItem,
   Grid,
+  Dialog,
+  DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AdminClientPage = () => {
+const AdminClientPage = ({open, onClose}) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -24,6 +26,10 @@ const AdminClientPage = () => {
     wallet_address: "",
     type: "",
   });
+
+  const handleClose = () => {
+    onClose()
+  }
 
   const [token, setToken] = useState("");
 
@@ -101,18 +107,9 @@ const AdminClientPage = () => {
 
 
   return (
+    <Dialog onClose={handleClose} open={open}>
+      <DialogTitle>Add client</DialogTitle>
     <Box sx={{ flexGrow: 1, minHeight: "100vh", backgroundColor: "#f7f9fc" }}>
-      {/* Navbar */}
-      <AppBar position="static" sx={{ backgroundColor: "#4a90e2" }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Nova Transfer
-          </Typography>
-          <Button color="inherit" onClick={() => navigate("/admin-dashboard")}>
-            Dashboard
-          </Button>
-        </Toolbar>
-      </AppBar>
 
       {/* Main Content */}
       <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -248,6 +245,7 @@ const AdminClientPage = () => {
         </Box>
       </Container>
     </Box>
+    </Dialog>
   );
 };
 

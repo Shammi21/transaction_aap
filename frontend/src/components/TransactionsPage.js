@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import {
@@ -22,6 +22,7 @@ import {
     TablePagination,  // Import TablePagination component
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 dayjs.extend(isBetween);
 
@@ -124,24 +125,99 @@ const TransactionsPage = () => {
         setModalOpen(false);
     };
 
+    const [token, setToken] = useState("");
+
+    const fetchToken = async () => {
+        const loginUrl = "https://nova.terrapayz.com/api/auth/login";
+    
+        try {
+          console.log("Attempting to fetch token...");
+    
+          const response = await axios.post(loginUrl, {
+            username: "admin",
+            password: "admin",
+          });
+    
+          console.log("Token response:", response.data);
+    
+          if (response.data && response.data.access_token) {
+            const fetchedToken = response.data.access_token;
+            setToken(fetchedToken);
+    
+            // Optionally, store the token in localStorage
+            localStorage.setItem("authToken", fetchedToken);
+    
+            return fetchedToken;
+          } else {
+            console.error("Access token not found in response:", response.data);
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching token:", error.response?.data || error.message);
+          return null;
+        }
+      };
+
+      const getAllTransactions = async () => {
+        const apiUrl = "https://nova.terrapayz.com/api/transactions/all";
+        let currentToken = token || (await fetchToken());
+      
+        // Check if token is available
+        if (!currentToken) {
+          console.error("Token not available. Cannot proceed.");
+          return;
+        }
+      
+        try {
+          // Perform GET request with the correct structure
+          const response = await axios.get(
+            apiUrl,
+            {
+              headers: {
+                Authorization: `Bearer ${currentToken}`,
+              },
+              data : {status: "true"}
+            }
+            
+          );
+          // Log response data
+          console.log("Transactions fetched successfully:", response.data);
+          return response.data; // Optionally return data for further processing
+        } catch (error) {
+          // Log detailed error
+          console.error(
+            "Error fetching transactions:",
+            error.response?.data || error.message
+          );
+        }
+      };
+      
+      
+
+    // useEffect(() => {
+    //     getAllTransactions()
+    // }, [])
+
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#f7f9fc', paddingBottom: '30px', position: 'relative' }}>
             {/* Back to Dashboard Button */}
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleBackToDashboard}
-                sx={{ position: 'absolute', top: 20, left: 20 }}
-            >
-                Back to Dashboard
-            </Button>
+            
 
             <Container maxWidth="lg" sx={{ marginTop: '100px' }}>
                 {/* Header */}
+                <Box>
                 <Typography variant="h4" gutterBottom>
                     Transaction History
                 </Typography>
-
+                <Button
+                variant="contained"
+                color="primary"
+                onClick={() => getAllTransactions()}
+                // sx={{ position: 'absolute', top: 20, left: 20 }}
+            >
+                Back to Dashboard
+            </Button>
+                </Box>
                 {/* Total Successful Amount */}
                 <Typography variant="h6" sx={{ marginBottom: '20px' }}>
                     Total Successful Transactions: <strong>${totalSuccessfulAmount.toFixed(2)}</strong>
@@ -201,6 +277,7 @@ const TransactionsPage = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
+                            {console.log(filteredTransactions)}
                             {filteredTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((transaction) => (
                                 <TableRow key={transaction.id}>
                                     <TableCell>{transaction.id}</TableCell>

@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Paper, Container, Grid, Card, CardContent,ButtonGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
+import AdminClientPage from './AddClientPage';
 
 
 const AdminDashboard = () => {
+  const [open, setOpen] = useState(false)
+const handleOpen = () => {
+  setOpen(true)
+}
+  const handleClose = () => {
+    setOpen(false)
+  }
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -23,6 +31,10 @@ const AdminDashboard = () => {
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', backgroundColor: '#f7f9fc' }}>
       {/* Navbar */}
+      <AdminClientPage 
+      open={open}
+      onClose={handleClose}
+      />
       <AppBar position="static" sx={{ backgroundColor: '#4a90e2' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
@@ -37,7 +49,7 @@ const AdminDashboard = () => {
                 textTransform: 'capitalize',
                 fontWeight: 'medium',
               }}
-              onClick={() => navigate('/add-client')}
+              onClick={handleOpen}
             >
               Add Client
             </Button>
@@ -61,7 +73,7 @@ const AdminDashboard = () => {
                 textTransform: 'capitalize',
                 fontWeight: 'medium',
               }}
-              onClick={() => navigate('/request')}
+              onClick={() => navigate('/admin-request')}
             >
               New Request
             </Button>

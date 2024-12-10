@@ -18,29 +18,107 @@ import {
   Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const RequestPage = () => {
   const navigate = useNavigate();
   const [amount, setAmount] = useState('');
   const [transactionType, setTransactionType] = useState('Card');
   const [requestHistory, setRequestHistory] = useState([]);
+  const [token, setToken] = useState("");
 
-  const handleSubmit = () => {
-    if (amount && transactionType) {
+  const fetchToken = async () => {
+    const loginUrl = "https://nova.terrapayz.com/api/auth/login";
+
+    try {
+      console.log("Attempting to fetch token...");
+
+      const response = await axios.post(loginUrl, {
+        username: "admin",
+        password: "admin",
+      });
+
+      console.log("Token response:", response.data);
+
+      if (response.data && response.data.access_token) {
+        const fetchedToken = response.data.access_token;
+        setToken(fetchedToken);
+
+        // Optionally, store the token in localStorage
+        localStorage.setItem("authToken", fetchedToken);
+
+        return fetchedToken;
+      } else {
+        console.error("Access token not found in response:", response.data);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error.response?.data || error.message);
+      return null;
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Ensure token is fetched
+      let currentToken = token || (await fetchToken());
+  
+      // Validate required fields
+      if (!amount || !transactionType) {
+        alert("Please fill out all fields.");
+        return;
+      }
+  
+      // Prepare the new request
       const newRequest = {
         id: requestHistory.length + 1,
         amount: `$${amount}`,
         transactionType,
         date: new Date().toLocaleString(),
       };
-
+  
+      // Optimistically update UI
       setRequestHistory((prev) => [newRequest, ...prev]);
-      setAmount('');
-      setTransactionType('Card');
-    } else {
-      alert('Please fill out all fields.');
+  
+      // Log request details
+      console.log("Request Details:", amount, transactionType);
+  
+      // Make API request
+      const response = await axios.post(
+        "https://nova.terrapayz.com/api/transactions/create_new_request",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currentToken}`,
+          },
+          data: {
+            amount,
+            transaction_type: transactionType,
+          },
+        }
+      );
+  
+      // Handle API response
+      if (response?.data) {
+        console.log("API Response:", response.data);
+        // Clear fields only after a successful response
+        setAmount("");
+        setTransactionType("Card");
+        // Optionally handle snackbar or success messages
+        // setSnakBar({ text: "Transaction created successfully", status: "success" });
+      } else {
+        console.error("Unexpected response:", response);
+      }
+    } catch (error) {
+      console.error(
+        "Transaction creation failed:",
+        error.response?.data || error.message
+      );
+      // Optionally handle error messages
+      // setSnakBar({ text: "Transaction creation failed", status: "error" });
     }
   };
+  
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', backgroundColor: '#eef2f7' }}>
@@ -137,6 +215,7 @@ const RequestPage = () => {
                     borderRadius: 2,
                     '&:hover': { backgroundColor: '#3cb591' },
                   }}
+                  onClick={handleSubmit}
                 >
                   Submit Request
                 </Button>
