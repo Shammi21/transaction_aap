@@ -22,8 +22,12 @@ import {
   InputAdornment,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
-import { Search, Refresh } from "@mui/icons-material";
+import { Search, Refresh, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AdminClientPage from "./AddClientPage";
 
@@ -38,6 +42,8 @@ const ClientDetailsPage = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddClientOpen, setAddClientOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
+  const [updatedFee, setUpdatedFee] = useState("");
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -72,12 +78,43 @@ const ClientDetailsPage = () => {
     // Add more clients as needed
   ];
 
-  const filteredClients = clientData.filter(
+  const [clients, setClients] = useState(clientData);
+
+  const filteredClients = clients.filter(
     (client) =>
       client.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleEditClick = (client) => {
+    setEditingClient(client);
+    setUpdatedFee(client.fee_percentage);
+  };
+
+  const handleEditSave = () => {
+    setClients((prevClients) =>
+      prevClients.map((client) =>
+        client.username === editingClient.username
+          ? { ...client, fee_percentage: updatedFee }
+          : client
+      )
+    );
+    setSnackbar({
+      open: true,
+      message: "Fee updated successfully!",
+      severity: "success",
+    });
+    setEditingClient(null);
+  };
+
+  const handleEditCancel = () => {
+    setEditingClient(null);
+  };
+
+  const handleClientClick = (client) => {
+    navigate("/client-profile", { state: { client } });
+  };
 
   return (
     <Box>
@@ -157,12 +194,13 @@ const ClientDetailsPage = () => {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell>Name</TableCell>
                   <TableCell>Username</TableCell>
                   <TableCell>Email</TableCell>
-                  <TableCell>Name</TableCell>
                   <TableCell>Fee Percentage</TableCell>
                   <TableCell>Wallet Address</TableCell>
                   <TableCell>Type</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -172,13 +210,28 @@ const ClientDetailsPage = () => {
                     <TableRow
                       key={index}
                       sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
+                      onClick={() => handleClientClick(client)}
+                      style={{ cursor: "pointer" }}
                     >
+                      <TableCell>{client.name}</TableCell>
                       <TableCell>{client.username}</TableCell>
                       <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.name}</TableCell>
                       <TableCell>{client.fee_percentage}%</TableCell>
                       <TableCell>{client.wallet_address}</TableCell>
                       <TableCell>{client.type}</TableCell>
+                      <TableCell>
+                        <Tooltip title="Edit Fee">
+                          <IconButton
+                            color="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditClick(client);
+                            }}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>
@@ -195,6 +248,33 @@ const ClientDetailsPage = () => {
           />
         </CardContent>
       </Card>
+
+      {editingClient && (
+        <Dialog open={!!editingClient} onClose={handleEditCancel}>
+          <DialogTitle>Edit Fee Percentage</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              type="number"
+              label="Fee Percentage"
+              value={updatedFee}
+              onChange={(e) => setUpdatedFee(e.target.value)}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              sx={{ mt: 2 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleEditCancel} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleEditSave} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
 
       <Snackbar
         open={snackbar.open}

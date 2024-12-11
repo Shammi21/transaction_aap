@@ -12,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminClientPage from './components/AddClientPage';
 import AdminRequestPage from './components/AdminRequestPage';
 import ClientDetailsPage from './components/ClientDetailsPage';
+import ClientProfilePage from './components/ClientProfilePage';
 const App = () => {
   return (
     <Router>
@@ -31,6 +32,7 @@ const App = () => {
         <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/admin-request" element={<AdminRequestPage />} />
         <Route path="/client-details" element={<ClientDetailsPage />} />
+        <Route path="/client-profile" element={<ClientProfilePage />} />
 
 
         {/* Fallback Route */}
