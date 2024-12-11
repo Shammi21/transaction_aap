@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Paper, Container, Grid, Card, CardContent,ButtonGroup } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  Paper,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  ButtonGroup,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
 import AdminClientPage from './AddClientPage';
 
-
 const AdminDashboard = () => {
-  const [open, setOpen] = useState(false)
-const handleOpen = () => {
-  setOpen(true)
-}
-  const handleClose = () => {
-    setOpen(false)
-  }
+  const [isAddClientOpen, setAddClientOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -30,18 +35,19 @@ const handleOpen = () => {
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', backgroundColor: '#f7f9fc' }}>
+      {/* Modals */}
+      {isAddClientOpen && (
+        <AdminClientPage open={isAddClientOpen} onClose={() => setAddClientOpen(false)} />
+      )}
+
       {/* Navbar */}
-      <AdminClientPage 
-      open={open}
-      onClose={handleClose}
-      />
       <AppBar position="static" sx={{ backgroundColor: '#4a90e2' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Nova Transfer
           </Typography>
           <ButtonGroup variant="text" aria-label="nav buttons" sx={{ gap: 1 }}>
-          <Button
+            <Button
               startIcon={<ListAlt />}
               sx={{
                 color: 'white',
@@ -49,12 +55,24 @@ const handleOpen = () => {
                 textTransform: 'capitalize',
                 fontWeight: 'medium',
               }}
-              onClick={handleOpen}
+              onClick={() => navigate('/client-details')}
+            >
+              Clients
+            </Button>
+            {/* <Button
+              startIcon={<AddCircle />}
+              sx={{
+                color: 'white',
+                '&:hover': { backgroundColor: '#3a7bd5' },
+                textTransform: 'capitalize',
+                fontWeight: 'medium',
+              }}
+              onClick={() => setAddClientOpen(true)}
             >
               Add Client
-            </Button>
+            </Button> */}
             <Button
-              startIcon={<ListAlt />}
+              startIcon={<ReceiptLong />}
               sx={{
                 color: 'white',
                 '&:hover': { backgroundColor: '#3a7bd5' },

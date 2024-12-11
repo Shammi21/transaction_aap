@@ -11,6 +11,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import AdminDashboard from './components/AdminDashboard';
 import AdminClientPage from './components/AddClientPage';
 import AdminRequestPage from './components/AdminRequestPage';
+import ClientDetailsPage from './components/ClientDetailsPage';
 const App = () => {
   return (
     <Router>
@@ -29,6 +30,7 @@ const App = () => {
         <Route path="/upload-receipts" element={<UploadReceiptsPage />} />
         <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/admin-request" element={<AdminRequestPage />} />
+        <Route path="/client-details" element={<ClientDetailsPage />} />
 
 
         {/* Fallback Route */}

@@ -47,29 +47,45 @@ const LoginPage = () => {
     }
 
     setLoading(true);
-    try {
-      const response = await axios.post('https://nova.terrapayz.com/api/auth/login', {
-        username,
-        password
-      });
-      if (response?.data) {
-        if(response?.data.data.type === 'UserType.ADMIN'){
-          navigate("/admin-dashboard");
-        }else{
-          navigate("/dashboard");
-        }
+    // try {
+    //   const response = await axios.post('https://nova.terrapayz.com/api/auth/login', {
+    //     username,
+    //     password
+    //   });
+    //   if (response?.data) {
+    //     if(response?.data.data.type === 'UserType.ADMIN'){
+    //       navigate("/admin-dashboard");
+    //     }else{
+    //       navigate("/dashboard");
+    //     }
+    //   } else {
+    //     setSnakBar({ text: 'Invalid username or password', status: 'error' });
+    //   }
+    //   setSnakBar({ text: 'Login successfully', status: 'success' });
+    //   setLoading(false);
+    //   return response.data;
+    // } catch (error) {
+    //   handleClick();
+    //   console.error("Login failed:", error.response?.data || error.message);
+    //   setLoading(false);
+    //   setSnakBar({ text: 'Login failed', status: 'error' });
+    // }
+
+    setTimeout(() => {
+      setLoading(false);
+
+      if (username === "admin" && password === "123") {
+        setSnakBar({ text: 'Login successfully', status: 'success' });
+        navigate("/admin-dashboard");
+      } else if (username === "user" && password === "123") {
+        setSnakBar({ text: 'Login successfully', status: 'success' });
+        navigate("/dashboard");
       } else {
         setSnakBar({ text: 'Invalid username or password', status: 'error' });
       }
-      setSnakBar({ text: 'Login successfully', status: 'success' });
-      setLoading(false);
-      return response.data;
-    } catch (error) {
-      handleClick();
-      console.error("Login failed:", error.response?.data || error.message);
-      setLoading(false);
-      setSnakBar({ text: 'Login failed', status: 'error' });
-    }
+
+      handleClick(); // Show Snackbar
+    }, 1000); // Simulate delay
   };
 
   useEffect(() => {

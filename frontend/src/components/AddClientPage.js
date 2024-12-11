@@ -1,250 +1,273 @@
 import React, { useState } from "react";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Button,
   Box,
-  Container,
-  TextField,
-  MenuItem,
   Grid,
   Dialog,
-  DialogTitle,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  TextField,
+  MenuItem,
+  Snackbar,
+  Alert,
+  InputAdornment,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-const AdminClientPage = ({open, onClose}) => {
+const AdminClientPage = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     name: "",
-    fee_percentage: "",
+    fee_percentage: 0,
     wallet_address: "",
-    type: "",
+    type: "Client", // Preselect the type as Client
+  });
+
+  const [errors, setErrors] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success", // Can be "success", "error", "info", or "warning"
   });
 
   const handleClose = () => {
-    onClose()
-  }
-
-  const [token, setToken] = useState("");
-
-  // Function to fetch token dynamically (mock implementation)
-  const fetchToken = async () => {
-    const loginUrl = "https://nova.terrapayz.com/api/auth/login";
-
-    try {
-      console.log("Attempting to fetch token...");
-
-      const response = await axios.post(loginUrl, {
-        username: "admin",
-        password: "admin",
-      });
-
-      console.log("Token response:", response.data);
-
-      if (response.data && response.data.access_token) {
-        const fetchedToken = response.data.access_token;
-        setToken(fetchedToken);
-
-        // Optionally, store the token in localStorage
-        localStorage.setItem("authToken", fetchedToken);
-
-        return fetchedToken;
-      } else {
-        console.error("Access token not found in response:", response.data);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching token:", error.response?.data || error.message);
-      return null;
-    }
+    setFormData({
+      username: "",
+      email: "",
+      password: "",
+      name: "",
+      fee_percentage: 0,
+      wallet_address: "",
+      type: "Client", // Reset to preselected type
+    });
+    setErrors({});
+    onClose();
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
-
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
-    const apiUrl = "https://nova.terrapayz.com/api/admin/users/";
+  const handleFeePercentageChange = (operation) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      fee_percentage:
+        operation === "increase" ? prevData.fee_percentage + 1 : Math.max(0, prevData.fee_percentage - 1),
+    }));
+  };
 
-    // Ensure token is available before making the API call
-    let currentToken = token || (await fetchToken());
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    if (!currentToken) {
-      console.error("Token not available. Cannot proceed.");
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      if (key !== "wallet_address" && !formData[key]) {
+        newErrors[key] = `${key.replace("_", " ")} is required`;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    try {
-      const response = await axios.post(apiUrl, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-        },
-      });
+    console.log("Form submitted successfully with data:", formData);
 
-      console.log("Client created successfully:", response.data);
+    setSnackbar({
+      open: true,
+      message: "Client created successfully!",
+      severity: "success",
+    });
 
-      // Navigate to a success or admin dashboard page if needed
-      navigate("/admin-dashboard");
-    } catch (error) {
-      console.error("Error creating client:", error.response?.data || error.message);
-    }
+    setFormData({
+      username: "",
+      email: "",
+      password: "",
+      name: "",
+      fee_percentage: 0,
+      wallet_address: "",
+      type: "Client", // Reset to preselected type
+    });
+    setErrors({});
   };
 
-
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Add client</DialogTitle>
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", backgroundColor: "#f7f9fc" }}>
-
-      {/* Main Content */}
-      <Container maxWidth="sm" sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Submit a Request
-        </Typography>
-
-        {/* Form */}
-        <Box
-          component="form"
-          sx={{ mt: 4 }}
-          noValidate
-          autoComplete="off"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
+    <Dialog
+      onClose={handleClose}
+      open={open}
+      fullWidth
+      maxWidth="sm"
+      sx={{
+        ".MuiPaper-root": {
+          borderRadius: "16px",
+          overflow: "hidden",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+        },
+      }}
+    >
+      <Card>
+        <CardHeader
+          title="Add Client"
+          sx={{
+            backgroundColor: "#1976d2",
+            color: "#fff",
+            textAlign: "center",
+            padding: "16px",
+            fontSize: "1.5rem",
           }}
-        >
-          <Grid container spacing={3}>
-            {/* Username Input */}
-            <Grid item xs={12}>
-              <TextField
-                label="Username"
-                name="username"
-                variant="outlined"
-                fullWidth
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
+        />
+        <Divider />
+        <CardContent sx={{ padding: "24px" }}>
+          <Box
+            component="form"
+            sx={{ mt: 2 }}
+            noValidate
+            autoComplete="off"
+            onSubmit={handleSubmit}
+          >
+            <Grid container spacing={3}>
+              {Object.keys(formData).map((key) => (
+                <Grid item xs={12} sm={key === "fee_percentage" || key === "type" ? 6 : 12} key={key}>
+                  {key === "type" ? (
+                    <TextField
+                      select
+                      label="Type"
+                      name="type"
+                      variant="outlined"
+                      fullWidth
+                      value={formData[key]}
+                      onChange={handleChange}
+                      required
+                      error={!!errors[key]}
+                      helperText={errors[key]}
+                    >
+                      <MenuItem value="Admin">Admin</MenuItem>
+                      <MenuItem value="Client">Client</MenuItem>
+                    </TextField>
+                  ) : key === "fee_percentage" ? (
+                    <TextField
+                      label="Fee Percentage"
+                      name="fee_percentage"
+                      variant="outlined"
+                      fullWidth
+                      type="number"
+                      value={formData[key]}
+                      onChange={handleChange}
+                      required
+                      error={!!errors[key]}
+                      helperText={errors[key]}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Tooltip title="Increase">
+                              <IconButton
+                                onClick={() => handleFeePercentageChange("increase")}
+                                color="primary"
+                              >
+                                <KeyboardArrowUpIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Decrease">
+                              <IconButton
+                                onClick={() => handleFeePercentageChange("decrease")}
+                                color="primary"
+                              >
+                                <KeyboardArrowDownIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  ) : (
+                    <TextField
+                      label={key
+                        .replace("_", " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      name={key}
+                      variant="outlined"
+                      fullWidth
+                      value={formData[key]}
+                      onChange={handleChange}
+                      placeholder={`Enter ${key.replace("_", " ")}`}
+                      required={key !== "wallet_address"} // wallet_address is not required
+                      error={!!errors[key]}
+                      helperText={errors[key]}
+                    />
+                  )}
+                </Grid>
+              ))}
             </Grid>
-
-            {/* Email Input */}
-            <Grid item xs={12}>
-              <TextField
-                type="email"
-                label="Email"
-                name="email"
-                variant="outlined"
-                fullWidth
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Password Input */}
-            <Grid item xs={12}>
-              <TextField
-                type="password"
-                label="Password"
-                name="password"
-                variant="outlined"
-                fullWidth
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Name Input */}
-            <Grid item xs={12}>
-              <TextField
-                label="Name"
-                name="name"
-                variant="outlined"
-                fullWidth
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Fee Percentage Input */}
-            <Grid item xs={12}>
-              <TextField
-                label="Fee Percentage"
-                name="fee_percentage"
-                variant="outlined"
-                fullWidth
-                type="number"
-                value={formData.fee_percentage}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Wallet Address Input */}
-            <Grid item xs={12}>
-              <TextField
-                label="Wallet Address"
-                name="wallet_address"
-                variant="outlined"
-                fullWidth
-                value={formData.wallet_address}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* Type Dropdown */}
-            <Grid item xs={12}>
-              <TextField
-                select
-                label="Type"
-                name="type"
-                variant="outlined"
-                fullWidth
-                value={formData.type}
-                onChange={handleChange}
-                required
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 3,
+              }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleClose}
+                sx={{ fontWeight: "bold" }}
               >
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="Client">Client</MenuItem>
-              </TextField>
-            </Grid>
-
-            {/* Submit Button */}
-            <Grid item xs={12}>
+                Close
+              </Button>
               <Button
                 variant="contained"
                 size="large"
-                fullWidth
                 type="submit"
                 sx={{
                   backgroundColor: "#50e3c2",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  padding: "8px 24px",
                   "&:hover": { backgroundColor: "#3cb591" },
                 }}
               >
-                Submit Request
+                Create Client
               </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </Container>
-    </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Dialog>
   );
 };
