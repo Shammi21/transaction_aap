@@ -29,7 +29,7 @@ import {
 } from "@mui/material";
 import { Search, Refresh, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import AdminClientPage from "./AddClientPage";
+import AddClientPage from "./AddClientPage";
 
 const ClientDetailsPage = () => {
   const navigate = useNavigate();
@@ -119,7 +119,7 @@ const ClientDetailsPage = () => {
   return (
     <Box>
       {isAddClientOpen && (
-        <AdminClientPage open={isAddClientOpen} onClose={() => setAddClientOpen(false)} />
+        <AddClientPage open={isAddClientOpen} onClose={() => setAddClientOpen(false)} />
       )}
 
       <AppBar position="static" sx={{ backgroundColor: "#4a90e2" }}>

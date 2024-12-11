@@ -13,6 +13,7 @@ import AddClientPage from './components/AddClientPage';
 import AdminRequestPage from './components/AdminRequestPage';
 import ClientDetailsPage from './components/ClientDetailsPage';
 import ClientProfilePage from './components/ClientProfilePage';
+
 const App = () => {
   return (
     <Router>

@@ -15,7 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ListAlt, AddCircle, ReceiptLong, Logout } from '@mui/icons-material';
-import AdminClientPage from './AddClientPage';
+import AddClientPage from './AddClientPage';
 
 const AdminDashboard = () => {
   const [isAddClientOpen, setAddClientOpen] = useState(false);
@@ -37,7 +37,7 @@ const AdminDashboard = () => {
     <Box sx={{ flexGrow: 1, minHeight: '100vh', backgroundColor: '#f7f9fc' }}>
       {/* Modals */}
       {isAddClientOpen && (
-        <AdminClientPage open={isAddClientOpen} onClose={() => setAddClientOpen(false)} />
+        <AddClientPage open={isAddClientOpen} onClose={() => setAddClientOpen(false)} />
       )}
 
       {/* Navbar */}
