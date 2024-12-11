@@ -9,7 +9,7 @@ import UploadReceiptsPage from './components/UploadReceiptsPage';
 import TransactionsPage from './components/TransactionsPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import AdminDashboard from './components/AdminDashboard';
-import AdminClientPage from './components/AddClientPage';
+import AddClientPage from './components/AddClientPage';
 import AdminRequestPage from './components/AdminRequestPage';
 import ClientDetailsPage from './components/ClientDetailsPage';
 import ClientProfilePage from './components/ClientProfilePage';
@@ -25,7 +25,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
         <Route path="/request" element={<RequestPage />} />
-        <Route path="/add-client" element={<AdminClientPage />} />
+        <Route path="/add-client" element={<AddClientPage />} />
         <Route path="/card-details" element={<CardDetailsPage />} />
         <Route path="/bank-details" element={<BankDetailsPage />} />
         <Route path="/upload-receipts" element={<UploadReceiptsPage />} />

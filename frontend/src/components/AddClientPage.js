@@ -20,7 +20,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
 
-const AdminClientPage = ({ open, onClose }) => {
+const AddClientPage = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -272,4 +272,4 @@ const AdminClientPage = ({ open, onClose }) => {
   );
 };
 
-export default AdminClientPage;
+export default AddClientPage;
