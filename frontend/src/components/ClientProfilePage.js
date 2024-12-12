@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import ClientTransactionHistory from "./ClientTransactionHistory";
 import ClientFailTransactionHistory from "./ClientFailTransactionHistory";
 import ClientRequest from "./ClientRequest";
+import ViewClientReceipts from "./ViewClientReceipts";
 
 // Styled button for active state
 const StyledButton = styled(Button)(({ theme, active }) => ({
@@ -32,6 +33,7 @@ const ClientProfilePage = ({ client }) => {
   const [openTransactionDialog, setOpenTransactionDialog] = React.useState(false);
   const [openFailedTransactionDialog, setOpenFailedTransactionDialog] = React.useState(false);
   const [openRequestDialog, setOpenRequestDialog] = React.useState(false);
+  const [openUploadedReceiptsDialog, setOpenUploadedReceiptsDialog] = React.useState(false);
 
   if (!client) {
     return (
@@ -47,7 +49,7 @@ const ClientProfilePage = ({ client }) => {
   const sections = [
     { label: "Transactions" },
     { label: "Requests" },
-    { label: "Uploaded Receipts", content: <div>All uploaded receipts by {client.name}</div> },
+    { label: "Uploaded Receipts" },
     { label: "Failed Transactions" },
     { label: "Support Tickets", content: <div>Support tickets raised by {client.name}</div> },
   ];
@@ -74,6 +76,14 @@ const ClientProfilePage = ({ client }) => {
 
   const handleCloseRequestDialog = () => {
     setOpenRequestDialog(false);
+  };
+
+  const handleOpenUploadedReceiptsDialog = () => {
+    setOpenUploadedReceiptsDialog(true);
+  };
+
+  const handleCloseUploadedReceiptsDialog = () => {
+    setOpenUploadedReceiptsDialog(false);
   };
 
   return (
@@ -118,6 +128,9 @@ const ClientProfilePage = ({ client }) => {
                 if (section.label === "Requests") {
                   handleOpenRequestDialog();
                 }
+                if (section.label === "Uploaded Receipts") {
+                  handleOpenUploadedReceiptsDialog();
+                }
               }}
             >
               {section.label}
@@ -149,6 +162,13 @@ const ClientProfilePage = ({ client }) => {
         client={client}
         open={openRequestDialog}
         onClose={handleCloseRequestDialog}
+      />
+
+      {/* Uploaded Receipts Dialog */}
+      <ViewClientReceipts
+        client={client}
+        open={openUploadedReceiptsDialog}
+        onClose={handleCloseUploadedReceiptsDialog}
       />
     </Box>
   );

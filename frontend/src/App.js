@@ -16,6 +16,7 @@ import ClientProfilePage from './components/ClientProfilePage';
 import ClientTransactionHistory from './components/ClientTransactionHistory';
 import ClientFailTransactionHistory from './components/ClientFailTransactionHistory';
 import ClientRequest from './components/ClientRequest';
+import ViewClientReceipts from './components/ViewClientReceipts';
 const App = () => {
   return (
     <Router>
@@ -39,6 +40,7 @@ const App = () => {
         <Route path="/client-transaction-history" element={<ClientTransactionHistory />} />
         <Route path="/client-fail-transaction-history" element={<ClientFailTransactionHistory />} />
         <Route path="/client-request" element={<ClientRequest />} />
+        <Route path="/view-client-receipts" element={<ViewClientReceipts />} />
 
 
         {/* Fallback Route */}
