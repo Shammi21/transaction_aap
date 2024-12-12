@@ -1,31 +1,37 @@
 import React from "react";
 import {
   Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  ButtonGroup,
-  Button,
   Card,
   CardContent,
-  Tabs,
-  Tab,
+  Typography,
+  Button,
+  ButtonGroup,
+  useTheme,
+  styled,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ClientTransactionHistory from "./ClientTransactionHistory";
+import ClientFailTransactionHistory from "./ClientFailTransactionHistory";
+import ClientRequest from "./ClientRequest";
 
-const ClientProfilePage = () => {
-  const location = useLocation();
+// Styled button for active state
+const StyledButton = styled(Button)(({ theme, active }) => ({
+  backgroundColor: active ? theme.palette.primary.dark : theme.palette.primary.light,
+  color: theme.palette.common.white,
+  '&:hover': {
+    backgroundColor: active ? theme.palette.primary.main : theme.palette.primary.dark,
+  },
+  transition: 'background-color 0.3s ease, transform 0.2s',
+  transform: active ? 'scale(1.05)' : 'scale(1)',
+}));
+
+const ClientProfilePage = ({ client }) => {
   const navigate = useNavigate();
-
-  // Extract the client from the passed state
-  const client = location.state?.client;
-
-  // Ensure hooks are called unconditionally
-  const [activeTab, setActiveTab] = React.useState(0);
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  const theme = useTheme();
+  const [activeSection, setActiveSection] = React.useState("Transactions");
+  const [openTransactionDialog, setOpenTransactionDialog] = React.useState(false);
+  const [openFailedTransactionDialog, setOpenFailedTransactionDialog] = React.useState(false);
+  const [openRequestDialog, setOpenRequestDialog] = React.useState(false);
 
   if (!client) {
     return (
@@ -38,29 +44,40 @@ const ClientProfilePage = () => {
     );
   }
 
-  const tabContent = [
-    { label: "Transactions", content: <div>List of all transactions for {client.name}</div> },
-    { label: "Requests", content: <div>List of all requests for {client.name}</div> },
+  const sections = [
+    { label: "Transactions" },
+    { label: "Requests" },
     { label: "Uploaded Receipts", content: <div>All uploaded receipts by {client.name}</div> },
-    { label: "Failed Transactions", content: <div>Failed transactions of {client.name}</div> },
+    { label: "Failed Transactions" },
     { label: "Support Tickets", content: <div>Support tickets raised by {client.name}</div> },
   ];
 
+  const handleOpenTransactionDialog = () => {
+    setOpenTransactionDialog(true);
+  };
+
+  const handleCloseTransactionDialog = () => {
+    setOpenTransactionDialog(false);
+  };
+
+  const handleOpenFailedTransactionDialog = () => {
+    setOpenFailedTransactionDialog(true);
+  };
+
+  const handleCloseFailedTransactionDialog = () => {
+    setOpenFailedTransactionDialog(false);
+  };
+
+  const handleOpenRequestDialog = () => {
+    setOpenRequestDialog(true);
+  };
+
+  const handleCloseRequestDialog = () => {
+    setOpenRequestDialog(false);
+  };
+
   return (
     <Box>
-      <AppBar position="static" sx={{ backgroundColor: "#4a90e2" }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-            {client.name}'s Profile
-          </Typography>
-          <ButtonGroup>
-            <Button variant="contained" color="secondary" onClick={() => navigate(-1)}>
-              Back
-            </Button>
-          </ButtonGroup>
-        </Toolbar>
-      </AppBar>
-
       <Card sx={{ mt: 2, mx: 2 }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
@@ -73,6 +90,9 @@ const ClientProfilePage = () => {
             Email: {client.email}
           </Typography>
           <Typography variant="body1" color="textSecondary">
+            Password: {client.password}
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
             Fee Percentage: {client.fee_percentage}%
           </Typography>
           <Typography variant="body1" color="textSecondary">
@@ -82,19 +102,54 @@ const ClientProfilePage = () => {
       </Card>
 
       <Box sx={{ mt: 3, mx: 2 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="scrollable"
-        >
-          {tabContent.map((tab, index) => (
-            <Tab label={tab.label} key={index} />
+        <ButtonGroup variant="text" color="primary" sx={{ display: 'flex', gap: 2 }}>
+          {sections.map((section) => (
+            <StyledButton
+              key={section.label}
+              active={activeSection === section.label ? true : false}
+              onClick={() => {
+                setActiveSection(section.label);
+                if (section.label === "Transactions") {
+                  handleOpenTransactionDialog();
+                }
+                if (section.label === "Failed Transactions") {
+                  handleOpenFailedTransactionDialog();
+                }
+                if (section.label === "Requests") {
+                  handleOpenRequestDialog();
+                }
+              }}
+            >
+              {section.label}
+            </StyledButton>
           ))}
-        </Tabs>
-        <Box sx={{ mt: 2 }}>{tabContent[activeTab].content}</Box>
+        </ButtonGroup>
+
+        <Box sx={{ mt: 2 }}>
+          {sections.find((section) => section.label === activeSection)?.content}
+        </Box>
       </Box>
+
+      {/* Transaction History Dialog */}
+      <ClientTransactionHistory
+        client={client}
+        open={openTransactionDialog}
+        onClose={handleCloseTransactionDialog}
+      />
+
+      {/* Failed Transaction History Dialog */}
+      <ClientFailTransactionHistory
+        client={client}
+        open={openFailedTransactionDialog}
+        onClose={handleCloseFailedTransactionDialog}
+      />
+
+      {/* Requests Dialog */}
+      <ClientRequest
+        client={client}
+        open={openRequestDialog}
+        onClose={handleCloseRequestDialog}
+      />
     </Box>
   );
 };

@@ -13,7 +13,9 @@ import AddClientPage from './components/AddClientPage';
 import AdminRequestPage from './components/AdminRequestPage';
 import ClientDetailsPage from './components/ClientDetailsPage';
 import ClientProfilePage from './components/ClientProfilePage';
-
+import ClientTransactionHistory from './components/ClientTransactionHistory';
+import ClientFailTransactionHistory from './components/ClientFailTransactionHistory';
+import ClientRequest from './components/ClientRequest';
 const App = () => {
   return (
     <Router>
@@ -34,6 +36,9 @@ const App = () => {
         <Route path="/admin-request" element={<AdminRequestPage />} />
         <Route path="/client-details" element={<ClientDetailsPage />} />
         <Route path="/client-profile" element={<ClientProfilePage />} />
+        <Route path="/client-transaction-history" element={<ClientTransactionHistory />} />
+        <Route path="/client-fail-transaction-history" element={<ClientFailTransactionHistory />} />
+        <Route path="/client-request" element={<ClientRequest />} />
 
 
         {/* Fallback Route */}

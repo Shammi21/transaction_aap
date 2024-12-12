@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -23,16 +24,15 @@ import {
   IconButton,
   Tooltip,
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import { Search, Refresh, Edit } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import AddClientPage from "./AddClientPage";
+import ClientProfilePage from "./ClientProfilePage"; // Import the profile page
 
 const ClientDetailsPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize useNavigate hook
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [snackbar, setSnackbar] = useState({
@@ -44,6 +44,7 @@ const ClientDetailsPage = () => {
   const [isAddClientOpen, setAddClientOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [updatedFee, setUpdatedFee] = useState("");
+  const [selectedClient, setSelectedClient] = useState(null); // For modal
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -57,12 +58,17 @@ const ClientDetailsPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  
+  const handleBack = () => {
+    navigate('/admin-dashboard'); // Redirect back to the Dashboard
+  };
 
   const clientData = [
     {
       username: "user1",
       email: "user1@example.com",
       name: "John Doe",
+      password: "password123",
       fee_percentage: 5,
       wallet_address: "0x1234567890abcdef",
       type: "Client",
@@ -71,11 +77,11 @@ const ClientDetailsPage = () => {
       username: "user2",
       email: "user2@example.com",
       name: "Jane Smith",
+      password: "password456",
       fee_percentage: 10,
       wallet_address: "0xabcdef1234567890",
       type: "Client",
     },
-    // Add more clients as needed
   ];
 
   const [clients, setClients] = useState(clientData);
@@ -87,33 +93,8 @@ const ClientDetailsPage = () => {
       client.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleEditClick = (client) => {
-    setEditingClient(client);
-    setUpdatedFee(client.fee_percentage);
-  };
-
-  const handleEditSave = () => {
-    setClients((prevClients) =>
-      prevClients.map((client) =>
-        client.username === editingClient.username
-          ? { ...client, fee_percentage: updatedFee }
-          : client
-      )
-    );
-    setSnackbar({
-      open: true,
-      message: "Fee updated successfully!",
-      severity: "success",
-    });
-    setEditingClient(null);
-  };
-
-  const handleEditCancel = () => {
-    setEditingClient(null);
-  };
-
   const handleClientClick = (client) => {
-    navigate("/client-profile", { state: { client } });
+    setSelectedClient(client); // Open modal with the selected client
   };
 
   return (
@@ -136,7 +117,7 @@ const ClientDetailsPage = () => {
               variant="contained"
               color="secondary"
               sx={{ textTransform: "capitalize", mr: 1 }}
-              onClick={() => navigate("/admin-dashboard")}
+              onClick={handleBack}
             >
               Back to Dashboard
             </Button>
@@ -197,10 +178,10 @@ const ClientDetailsPage = () => {
                   <TableCell>Name</TableCell>
                   <TableCell>Username</TableCell>
                   <TableCell>Email</TableCell>
+                  <TableCell>Password</TableCell>
                   <TableCell>Fee Percentage</TableCell>
                   <TableCell>Wallet Address</TableCell>
                   <TableCell>Type</TableCell>
-                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -209,29 +190,16 @@ const ClientDetailsPage = () => {
                   .map((client, index) => (
                     <TableRow
                       key={index}
-                      sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
                       onClick={() => handleClientClick(client)}
                       style={{ cursor: "pointer" }}
                     >
                       <TableCell>{client.name}</TableCell>
                       <TableCell>{client.username}</TableCell>
                       <TableCell>{client.email}</TableCell>
+                      <TableCell>{client.password}</TableCell>
                       <TableCell>{client.fee_percentage}%</TableCell>
                       <TableCell>{client.wallet_address}</TableCell>
                       <TableCell>{client.type}</TableCell>
-                      <TableCell>
-                        <Tooltip title="Edit Fee">
-                          <IconButton
-                            color="primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditClick(client);
-                            }}
-                          >
-                            <Edit />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>
@@ -249,33 +217,6 @@ const ClientDetailsPage = () => {
         </CardContent>
       </Card>
 
-      {editingClient && (
-        <Dialog open={!!editingClient} onClose={handleEditCancel}>
-          <DialogTitle>Edit Fee Percentage</DialogTitle>
-          <DialogContent>
-            <TextField
-              fullWidth
-              type="number"
-              label="Fee Percentage"
-              value={updatedFee}
-              onChange={(e) => setUpdatedFee(e.target.value)}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              sx={{ mt: 2 }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleEditCancel} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={handleEditSave} color="primary">
-              Save
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -290,6 +231,23 @@ const ClientDetailsPage = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Client Profile Modal */}
+      {selectedClient && (
+        <Dialog
+          open={!!selectedClient}
+          onClose={() => setSelectedClient(null)}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle>
+            <Typography variant="h6">{selectedClient.name}'s Profile</Typography>
+          </DialogTitle>
+          <DialogContent>
+            <ClientProfilePage client={selectedClient} />
+          </DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 };
